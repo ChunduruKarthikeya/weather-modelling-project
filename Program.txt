@@ -1,0 +1,158 @@
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+void solve_quadratic(double a, double b, double c) {
+    if (a == 0) {
+        printf("  Not a quadratic equation (a = 0).\n");
+        return;
+    }
+
+    double discriminant = b * b - 4 * a * c;
+    printf("  Equation: T(t) = %.2f t^2 + %.2f t + %.2f\n", a, b, c);
+    printf("  Discriminant = %.2f\n", discriminant);
+
+    if (discriminant > 0) {
+        double root1 = (-b + sqrt(discriminant)) / (2 * a);
+        double root2 = (-b - sqrt(discriminant)) / (2 * a);
+        printf("  Two real roots: t1 = %.4f, t2 = %.4f\n", root1, root2);
+    } else if (discriminant == 0) {
+        double root = -b / (2 * a);
+        printf("  One real root: t = %.4f\n", root);
+    } else {
+        printf("  No real roots (discriminant < 0).\n");
+    }
+}
+
+/* Version 1: Hard-coded coefficients */
+void version_hardcoded(void) {
+    printf("\n--- Version 1: Hard-coded coefficients ---\n");
+    double a = 1.0;
+    double b = -3.0;
+    double c = 2.0;
+
+    printf("Using hard-coded values: a = %.2f, b = %.2f, c = %.2f\n", a, b, c);
+    solve_quadratic(a, b, c);
+}
+
+/* Version 2: Keyboard input (single set) */
+void version_keyboard_single(void) {
+    printf("\n--- Version 2: Keyboard input (single set) ---\n");
+    double a, b, c;
+
+    printf("Enter coefficients a, b, c for T(t) = a t^2 + b t + c\n");
+    printf("a b c: ");
+
+    if (scanf("%lf %lf %lf", &a, &b, &c) != 3) {
+        printf("Invalid input.\n");
+        // clear input buffer
+        int ch;
+        while ((ch = getchar()) != '\n' && ch != EOF) {}
+        return;
+    }
+
+    solve_quadratic(a, b, c);
+}
+
+/* Version 3: Read ONE set from a file */
+void version_file_single(void) {
+    printf("\n--- Version 3: Read ONE set from a file ---\n");
+    char filename[256];
+    double a, b, c;
+
+    printf("Enter input filename (e.g., weather_input_single.txt): ");
+    scanf("%255s", filename);
+
+    FILE *fin = fopen(filename, "r");
+    if (fin == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    if (fscanf(fin, "%lf %lf %lf", &a, &b, &c) != 3) {
+        printf("Failed to read three coefficients from file.\n");
+        fclose(fin);
+        return;
+    }
+
+    fclose(fin);
+
+    printf("Read from file '%s': a = %.2f, b = %.2f, c = %.2f\n",
+           filename, a, b, c);
+    solve_quadratic(a, b, c);
+}
+
+/* Version 4: Read MULTIPLE sets from a file */
+void version_file_multi(void) {
+    printf("\n--- Version 4: Read MULTIPLE sets from a file ---\n");
+    char filename[256];
+    double a, b, c;
+    int modelIndex = 1;
+
+    printf("Enter input filename (e.g., weather_input_multi.txt): ");
+    scanf("%255s", filename);
+
+    FILE *fin = fopen(filename, "r");
+    if (fin == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    printf("\nReading multiple models from '%s'...\n\n", filename);
+
+    while (fscanf(fin, "%lf %lf %lf", &a, &b, &c) == 3) {
+        printf("Model #%d:\n", modelIndex);
+        solve_quadratic(a, b, c);
+        printf("\n");
+        modelIndex++;
+    }
+
+    if (modelIndex == 1) {
+        printf("No valid sets of coefficients found in file.\n");
+    }
+
+    fclose(fin);
+}
+
+int main(void) {
+    int choice;
+
+    do {
+        printf("\n================ WEATHER MODELING (QUADRATIC) ================\n");
+        printf("1. Hard-coded coefficients (single model)\n");
+        printf("2. Keyboard input (single model)\n");
+        printf("3. Read ONE model from a file\n");
+        printf("4. Read MULTIPLE models from a file\n");
+        printf("5. Exit\n");
+        printf("=============================================================\n");
+        printf("Enter your choice (1-5): ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Exiting.\n");
+            break;
+        }
+
+        switch (choice) {
+            case 1:
+                version_hardcoded();
+                break;
+            case 2:
+                version_keyboard_single();
+                break;
+            case 3:
+                version_file_single();
+                break;
+            case 4:
+                version_file_multi();
+                break;
+            case 5:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a number between 1 and 5.\n");
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
