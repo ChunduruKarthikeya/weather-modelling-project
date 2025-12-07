@@ -92,12 +92,7 @@ Model #1:
 
 ---
 
-## 🧑‍💻 Author
 
-* **Your Name**
-* GitHub: *(add link after creating account)*
-
----
 
 ## 🎯 Learning Outcomes
 
